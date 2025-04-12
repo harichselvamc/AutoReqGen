@@ -2,7 +2,6 @@ import os
 import ast
 
 def get_all_python_files(directory: str):
-    """Recursively fetch all Python files in a directory."""
     py_files = []
     for root, _, files in os.walk(directory):
         for file in files:
@@ -11,7 +10,6 @@ def get_all_python_files(directory: str):
     return py_files
 
 def extract_imports_from_file(filepath: str):
-    """Extract import statements from a Python file using AST."""
     with open(filepath, "r", encoding="utf-8") as f:
         node = ast.parse(f.read(), filename=filepath)
 
@@ -26,9 +24,18 @@ def extract_imports_from_file(filepath: str):
     return imports
 
 def scan_project_for_imports(path: str):
-    """Scan all Python files in a path and return unique imports."""
     all_imports = set()
     py_files = get_all_python_files(path)
+
+    # Get names of local .py modules (without .py)
+    local_modules = {
+        os.path.splitext(os.path.basename(f))[0]
+        for f in py_files
+    }
+
     for file in py_files:
         all_imports.update(extract_imports_from_file(file))
-    return sorted(all_imports)
+
+    # Filter out local modules
+    external_imports = sorted(all_imports - local_modules)
+    return external_imports
