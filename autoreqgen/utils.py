@@ -17,7 +17,7 @@ def clean_package_name(name: str) -> str:
 def print_banner():
     """Print a welcome banner."""
     print(r"""
-     🚀 AutoReqGen v0.1.0
+     🚀 AutoReqGen 
     """)
 
 # Test banner
