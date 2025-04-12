@@ -1,4 +1,4 @@
-Metadata-Version: 2.1
+Metadata-Version: 2.4
 Name: AutoReqGen
 Version: 0.1.0
 Summary: Smarter pipreqs alternative with code formatting and documentation generation
@@ -13,6 +13,10 @@ Keywords: pipreqs,automation,requirements,docgen,formatter
 Requires-Python: >=3.7
 Description-Content-Type: text/markdown
 License-File: LICENSE
+Dynamic: author
+Dynamic: home-page
+Dynamic: license-file
+Dynamic: requires-python
 
 # AutoReqGen
 ⚡ A smarter alternative to pipreqs — AutoReqGen scans your entire project recursively, accurately generates requirements.txt with exact versions, formats your code using tools like Black or isort, and even auto-generates documentation from your docstrings. One tool to automate and optimize your Python workflow.

@@ -14,6 +14,13 @@ AutoReqGen.egg-info/SOURCES.txt
 AutoReqGen.egg-info/dependency_links.txt
 AutoReqGen.egg-info/entry_points.txt
 AutoReqGen.egg-info/top_level.txt
+autoreqgen/__init__.py
+autoreqgen/cli.py
+autoreqgen/docgen.py
+autoreqgen/formatter.py
+autoreqgen/requirements.py
+autoreqgen/scanner.py
+autoreqgen/utils.py
 tests/test_cli.py
 tests/test_docgen.py
 tests/test_formatter.py

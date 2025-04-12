@@ -1,1 +1,1 @@
-AutoReqGen
+autoreqgen
