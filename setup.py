@@ -2,7 +2,7 @@ from setuptools import setup, find_packages
 
 setup(
     name="AutoReqGen",
-    version="0.1.1",
+    version="0.1.2",
     description="Smarter pipreqs alternative with code formatting and documentation generation",
     long_description=open("README.md", encoding="utf-8").read(),
     long_description_content_type="text/markdown",
@@ -30,6 +30,9 @@ setup(
     python_requires=">=3.7",
     install_requires=[
         "typer[all]",
+        "black",
+        "isort",
+        "autopep8"
     ],
     entry_points={
         "console_scripts": [
