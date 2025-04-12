@@ -15,12 +15,15 @@ def scan(path: Path = typer.Argument(..., help="Path to your Python project")):
     typer.echo(f"\n✅ Found {len(imports)} unique imports.")
 
 @app.command()
-def generate(path: Path = typer.Argument(..., help="Path to your Python project"),
-             output: str = typer.Option("requirements.txt", help="Output file name")):
-    """Generate requirements.txt with versions."""
+def generate(
+    path: Path = typer.Argument(..., help="Path to your Python project"),
+    output: str = typer.Option("requirements.txt", help="Output file name"),
+    with_versions: bool = typer.Option(True, help="Include version numbers in requirements.txt")
+):
+    """Generate requirements.txt with or without versions."""
     utils.print_banner()
     imports = scanner.scan_project_for_imports(str(path))
-    requirements.generate_requirements(imports, output_file=output)
+    requirements.generate_requirements(imports, output_file=output, with_versions=with_versions)
 
 @app.command()
 def format(tool: str = typer.Argument(..., help="Choose from: black, isort, autopep8"),
