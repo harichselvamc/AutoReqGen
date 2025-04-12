@@ -1,4 +1,4 @@
-name: Publish AutoReqGen to PyPI
+name: Publish AutoReqGen Package to PyPI
 
 on:
   push:
@@ -7,7 +7,7 @@ on:
 
 jobs:
   pypi-publish:
-    name: Upload release to PyPI
+    name: Upload AutoReqGen release to PyPI
     runs-on: ubuntu-latest
     environment:
       name: pypi
@@ -17,7 +17,7 @@ jobs:
       id-token: write  # Required for trusted publishing
 
     steps:
-      - name: Check if pushed by Harich Selva MC
+      - name: Check if pushed by Harichselvam
         run: |
           echo "Committer email: ${{ github.event.head_commit.committer.email }}"
           if [[ "${{ github.event.head_commit.committer.email }}" != "harichselvamc@gmail.com" ]]; then
@@ -26,27 +26,21 @@ jobs:
           fi
 
       - name: Checkout code
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
 
       - name: Set up Python
-        uses: actions/setup-python@v2
+        uses: actions/setup-python@v4
         with:
           python-version: '3.x'
 
-      - name: Install dependencies
+      - name: Install build dependencies
         run: |
           python -m pip install --upgrade pip
-          pip install setuptools wheel twine
+          pip install setuptools wheel twine build
 
-      - name: Auto-bump version (using timestamp)
+      - name: Build package
         run: |
-          TIMESTAMP=$(date +%Y%m%d%H%M)
-          sed -i "s/^version *= *['\"].*['\"]/version = \"0.1.${TIMESTAMP}\"/" pyproject.toml
-          sed -i "s/^__version__ *= *['\"].*['\"]/__version__ = \"0.1.${TIMESTAMP}\"/" autoreqgen/__init__.py
-
-      - name: Build dist
-        run: |
-          python setup.py sdist bdist_wheel
+          python -m build
 
       - name: Publish to PyPI
         uses: pypa/gh-action-pypi-publish@release/v1
