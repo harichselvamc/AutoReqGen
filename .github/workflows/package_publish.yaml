@@ -1,0 +1,55 @@
+name: Publish AutoReqGen to PyPI
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  pypi-publish:
+    name: Upload release to PyPI
+    runs-on: ubuntu-latest
+    environment:
+      name: pypi
+      url: https://pypi.org/project/autoreqgen/
+
+    permissions:
+      id-token: write  # Required for trusted publishing
+
+    steps:
+      - name: Check if pushed by Harich Selva MC
+        run: |
+          echo "Committer email: ${{ github.event.head_commit.committer.email }}"
+          if [[ "${{ github.event.head_commit.committer.email }}" != "harichselvamc@gmail.com" ]]; then
+            echo "❌ Commit not by harichselvamc@gmail.com. Exiting CI/CD."
+            exit 1
+          fi
+
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Set up Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: '3.x'
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install setuptools wheel twine
+
+      - name: Auto-bump version (using timestamp)
+        run: |
+          TIMESTAMP=$(date +%Y%m%d%H%M)
+          sed -i "s/^version *= *['\"].*['\"]/version = \"0.1.${TIMESTAMP}\"/" pyproject.toml
+          sed -i "s/^__version__ *= *['\"].*['\"]/__version__ = \"0.1.${TIMESTAMP}\"/" autoreqgen/__init__.py
+
+      - name: Build dist
+        run: |
+          python setup.py sdist bdist_wheel
+
+      - name: Publish to PyPI
+        uses: pypa/gh-action-pypi-publish@release/v1
+        with:
+          user: __token__
+          password: ${{ secrets.PYPI_API_TOKEN }}

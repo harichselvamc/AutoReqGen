@@ -1,0 +1,25 @@
+# Testing
+pytest
+coverage
+
+# Formatting
+black
+isort
+autopep8
+
+# CLI framework
+typer[all]
+
+# Linting
+flake8
+
+# Packaging
+setuptools>=42
+wheel
+build
+
+# Optional: Doc generation
+pdoc
+
+# Local development
+-e .

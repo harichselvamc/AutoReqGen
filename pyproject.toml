@@ -1,0 +1,25 @@
+[build-system]
+requires = ["setuptools>=42", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "AutoReqGen"
+version = "0.1.0"
+description = "Smarter pipreqs alternative with code formatting and documentation generation"
+readme = "README.md"
+requires-python = ">=3.7"
+license = { text = "MIT" }
+
+authors = [
+  { name = "Harichselvam", email = "harichselvamc@gmail.com" }
+]
+
+keywords = ["pipreqs", "automation", "requirements", "docgen", "formatter"]
+
+[project.urls]
+Documentation = "https://github.com/harichselvam/AutoReqGen"
+Source = "https://github.com/harichselvam/AutoReqGen"
+Issues = "https://github.com/harichselvam/AutoReqGen/issues"
+
+[project.scripts]
+autoreqgen = "autoreqgen.cli:app"
