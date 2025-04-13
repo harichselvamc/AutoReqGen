@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "AutoReqGen"
-version = "0.1.22"
+version = "0.1.23"
 description = "Smarter pipreqs alternative with code formatting and documentation generation"
 readme = "README.md"
 requires-python = ">=3.7"
@@ -15,6 +15,17 @@ authors = [
 ]
 
 keywords = ["pipreqs", "automation", "requirements", "docgen", "formatter"]
+
+dependencies = [
+  "typer[all]",
+  "black",
+  "isort",
+  "autopep8",
+  "watchdog",
+  "python-dotenv",
+  "stdlib-list",
+  "setuptools"
+]
 
 [project.urls]
 Documentation = "https://github.com/harichselvamc/AutoReqGen"
