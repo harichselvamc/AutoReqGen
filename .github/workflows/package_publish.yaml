@@ -47,7 +47,7 @@
 #         with:
 #           user: __token__
 #           password: ${{ secrets.PYPI_API_TOKEN }}
-name: Publish AutoReqGen Package to PyPI
+name: Publish AutoReqGen Package to PyPI and GitHub Packages
 
 on:
   push:
@@ -79,10 +79,10 @@ jobs:
 
       - name: Run tests
         run: |
-          python -m unittest discover tests || true  # prevent canceling matrix if one fails
+          python -m unittest discover tests || true
 
   pypi-publish:
-    name: Upload AutoReqGen release to PyPI
+    name: Upload AutoReqGen release to PyPI and GitHub Packages
     needs: test
     runs-on: ubuntu-latest
     environment:
@@ -90,7 +90,8 @@ jobs:
       url: https://pypi.org/project/autoreqgen/
 
     permissions:
-      id-token: write  # Required for trusted publishing
+      id-token: write  # Required for PyPI trusted publishing
+      packages: write  # Required to publish to GitHub Packages
 
     steps:
       - name: Check if pushed by Harichselvam
@@ -112,7 +113,7 @@ jobs:
       - name: Install build dependencies
         run: |
           pip install --upgrade pip
-          pip install setuptools wheel build
+          pip install setuptools wheel build twine
 
       - name: Build package
         run: |
@@ -123,7 +124,16 @@ jobs:
         with:
           print-hash: true
 
+      - name: Publish to GitHub Packages
+        run: |
+          twine upload --repository-url https://upload.pypi.org/legacy/ dist/*
+          twine upload --repository-url https://upload.github.com/ dist/*
+        env:
+          TWINE_USERNAME: __token__
+          TWINE_PASSWORD: ${{ secrets.PACKAGE_TOKEN }}
+
       - name: Mention in GitHub Packages
         run: |
           echo "📝 This package is published to PyPI: https://pypi.org/project/autoreqgen/"
-          echo "📦 You can also publish to GitHub Packages if needed: https://github.com/${{ github.repository }}/packages"
+          echo "📦 This package is now also available via GitHub Packages:"
+          echo "    https://github.com/${{ github.repository }}/packages"
