@@ -12,9 +12,7 @@ try:
 except ImportError:
     pass
 
-app = typer.Typer(help="🚀 AutoReqGen – Smarter Python dependency and tooling assistant.",
-                  add_completion=True,
-                  pretty_exceptions_show_locals=False)
+app = typer.Typer(help="🚀 AutoReqGen – Smarter Python dependency and tooling assistant.")
 
 @app.command()
 def scan(
@@ -35,38 +33,42 @@ def scan(
         typer.echo(f"\n✅ Found {len(imports)} unique imports.")
 
 
-@app.command(name="generate", aliases=["g"])
+@app.command()
 def generate(
     path: Path = typer.Argument(..., help="Path to your Python project"),
     output: str = typer.Option("requirements.txt", help="Output file name"),
     with_versions: bool = typer.Option(True, help="Include version numbers in requirements.txt")
 ):
+    """Generate requirements.txt with or without versions."""
     utils.print_banner()
     imports = scanner.scan_project_for_imports(str(path))
     requirements.generate_requirements(imports, output_file=output, with_versions=with_versions)
 
-@app.command(name="format", aliases=["f"])
-def format_code(
+@app.command()
+def format(
     tool: str = typer.Argument(..., help="Choose from: black, isort, autopep8"),
     path: Path = typer.Argument(".", help="Target path for formatting")
 ):
+    """Format code using Black, isort, or autopep8."""
     utils.print_banner()
     if not utils.is_tool_installed(tool):
         typer.echo(f"❌ Error: `{tool}` is not installed.")
         raise typer.Exit(code=1)
     formatter.run_formatter(tool, str(path))
 
-@app.command(name="docs", aliases=["d"])
+@app.command()
 def docs(
     path: Path = typer.Argument(..., help="Path to your Python code"),
     output: str = typer.Option("DOCUMENTATION.md", help="Output Markdown file"),
     include_private: bool = typer.Option(False, "--include-private", help="Include private functions and classes")
 ):
+    """Generate documentation from docstrings."""
     utils.print_banner()
     docgen.generate_docs(str(path), output_file=output, include_private=include_private)
 
-@app.command(name="add", aliases=["a"])
+@app.command()
 def add(package: str, path: Path = Path("requirements.txt")):
+    """Install a package and add it to requirements.txt (without version pinning)."""
     utils.print_banner()
     typer.echo(f"📦 Installing {package}...")
     result = subprocess.run(["pip", "install", package], capture_output=True, text=True)
@@ -88,8 +90,9 @@ def add(package: str, path: Path = Path("requirements.txt")):
 
     typer.echo(f"✅ {package} added to {path} (sorted & deduplicated)")
 
-@app.command(name="freeze")
+@app.command()
 def freeze(output: str = "requirements.txt"):
+    """Freeze the current environment and write exact package versions to a file."""
     utils.print_banner()
     typer.echo(f"📄 Freezing environment to {output}...")
     result = subprocess.run(["pip", "freeze"], capture_output=True, text=True)
@@ -104,8 +107,9 @@ def freeze(output: str = "requirements.txt"):
 
     typer.echo(f"✅ Environment frozen, sorted, and saved to {output}")
 
-@app.command(name="start", aliases=["newenv"])
+@app.command()
 def start():
+    """Create a new virtual environment by selecting Python version and name."""
     utils.print_banner()
     env_name = typer.prompt("Enter a name for your virtual environment")
     command = "where python" if platform.system() == "Windows" else "which -a python"
@@ -135,11 +139,12 @@ def start():
     else:
         typer.echo(f"❌ Failed to create virtual environment:\n{result.stderr}")
 
-@app.command(name="watch")
+@app.command()
 def watch(
     path: Path = typer.Argument(".", help="Path to watch for changes"),
     requirements_file: Path = typer.Option("requirements.txt", help="Requirements file to update")
 ):
+    """Watch file system for changes and auto-update requirements.txt."""
     utils.print_banner()
     typer.echo(f"👀 Watching {path} for changes...")
 
