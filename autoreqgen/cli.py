@@ -16,25 +16,24 @@ app = typer.Typer(help="🚀 AutoReqGen – Smarter Python dependency and toolin
                   add_completion=True,
                   pretty_exceptions_show_locals=False)
 
-@app.command(name="scan", help="Scan the project and list all imported packages.", aliases=["s"])
+@app.command()
 def scan(
     path: Path = typer.Argument(..., help="Path to your Python project"),
     all: bool = typer.Option(False, "--all", help="Include local and standard library modules"),
     as_json: bool = typer.Option(False, "--as-json", help="Output results in JSON format")
 ):
+    """Scan the project and list all imported packages."""
     utils.print_banner()
-    if all:
-        imports = scanner.extract_all_imports(str(path))
-    else:
-        imports = scanner.scan_project_for_imports(str(path))
-
+    imports = scanner.extract_all_imports(str(path)) if all else scanner.scan_project_for_imports(str(path))
     imports = sorted(imports)
+
     if as_json:
         typer.echo(json.dumps(imports, indent=2))
     else:
         for imp in imports:
             typer.echo(f"📦 {imp}")
         typer.echo(f"\n✅ Found {len(imports)} unique imports.")
+
 
 @app.command(name="generate", aliases=["g"])
 def generate(
