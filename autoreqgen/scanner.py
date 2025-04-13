@@ -1,5 +1,7 @@
 import os
 import ast
+import sys
+from stdlib_list import stdlib_list
 
 def get_all_python_files(directory: str):
     py_files = []
@@ -11,7 +13,10 @@ def get_all_python_files(directory: str):
 
 def extract_imports_from_file(filepath: str):
     with open(filepath, "r", encoding="utf-8") as f:
-        node = ast.parse(f.read(), filename=filepath)
+        try:
+            node = ast.parse(f.read(), filename=filepath)
+        except SyntaxError:
+            return set()  # skip files with syntax errors
 
     imports = set()
     for n in ast.walk(node):
@@ -27,15 +32,18 @@ def scan_project_for_imports(path: str):
     all_imports = set()
     py_files = get_all_python_files(path)
 
-    # Get names of local .py modules (without .py)
+    # Local module names (file names without .py)
     local_modules = {
         os.path.splitext(os.path.basename(f))[0]
         for f in py_files
     }
 
+    # Python stdlib for current version
+    stdlib = set(stdlib_list(f"{sys.version_info.major}.{sys.version_info.minor}"))
+
     for file in py_files:
         all_imports.update(extract_imports_from_file(file))
 
-    # Filter out local modules
-    external_imports = sorted(all_imports - local_modules)
+    # Filter out local modules and standard library
+    external_imports = sorted(all_imports - local_modules - stdlib)
     return external_imports
