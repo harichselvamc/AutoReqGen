@@ -1,3 +1,52 @@
+# name: Publish AutoReqGen Package to PyPI
+
+# on:
+#   push:
+#     branches:
+#       - main
+
+# jobs:
+#   pypi-publish:
+#     name: Upload AutoReqGen release to PyPI
+#     runs-on: ubuntu-latest
+#     environment:
+#       name: pypi
+#       url: https://pypi.org/project/autoreqgen/
+
+#     permissions:
+#       id-token: write  # Required for trusted publishing
+
+#     steps:
+#       - name: Check if pushed by Harichselvam
+#         run: |
+#           echo "Committer email: ${{ github.event.head_commit.committer.email }}"
+#           if [[ "${{ github.event.head_commit.committer.email }}" != "harichselvamc@gmail.com" ]]; then
+#             echo "❌ Commit not by harichselvamc@gmail.com. Exiting CI/CD."
+#             exit 1
+#           fi
+
+#       - name: Checkout code
+#         uses: actions/checkout@v3
+
+#       - name: Set up Python
+#         uses: actions/setup-python@v4
+#         with:
+#           python-version: '3.x'
+
+#       - name: Install build dependencies
+#         run: |
+#           python -m pip install --upgrade pip
+#           pip install setuptools wheel twine build
+
+#       - name: Build package
+#         run: |
+#           python -m build
+
+#       - name: Publish to PyPI
+#         uses: pypa/gh-action-pypi-publish@release/v1
+#         with:
+#           user: __token__
+#           password: ${{ secrets.PYPI_API_TOKEN }}
 name: Publish AutoReqGen Package to PyPI
 
 on:
@@ -6,8 +55,35 @@ on:
       - main
 
 jobs:
+  test:
+    name: Test on ${{ matrix.os }} - Python ${{ matrix.python-version }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-latest, windows-latest, macos-latest]
+        python-version: ['3.7', '3.8', '3.9', '3.10', '3.11']
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v4
+        with:
+          python-version: ${{ matrix.python-version }}
+
+      - name: Install dependencies
+        run: |
+          pip install --upgrade pip
+          pip install -e .[dev]
+
+      - name: Run tests
+        run: |
+          python -m unittest discover tests
+
   pypi-publish:
     name: Upload AutoReqGen release to PyPI
+    needs: test
     runs-on: ubuntu-latest
     environment:
       name: pypi
@@ -23,7 +99,6 @@ jobs:
           if [[ "${{ github.event.head_commit.committer.email }}" != "harichselvamc@gmail.com" ]]; then
             echo "❌ Commit not by harichselvamc@gmail.com. Exiting CI/CD."
             exit 1
-          fi
 
       - name: Checkout code
         uses: actions/checkout@v3
@@ -31,19 +106,23 @@ jobs:
       - name: Set up Python
         uses: actions/setup-python@v4
         with:
-          python-version: '3.x'
+          python-version: '3.11'
 
       - name: Install build dependencies
         run: |
-          python -m pip install --upgrade pip
-          pip install setuptools wheel twine build
+          pip install --upgrade pip
+          pip install setuptools wheel build
 
       - name: Build package
         run: |
           python -m build
 
-      - name: Publish to PyPI
+      - name: Publish to PyPI (via Trusted Publisher)
         uses: pypa/gh-action-pypi-publish@release/v1
         with:
-          user: __token__
-          password: ${{ secrets.PYPI_API_TOKEN }}
+          print-hash: true
+
+      - name: Mention in GitHub Packages
+        run: |
+          echo "📝 This package is published to PyPI: https://pypi.org/project/autoreqgen/"
+          echo "📦 Consider publishing to GitHub Packages as well: https://github.com/${{ github.repository }}/packages"
