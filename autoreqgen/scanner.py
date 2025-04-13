@@ -47,3 +47,10 @@ def scan_project_for_imports(path: str):
     # Filter out local modules and standard library
     external_imports = sorted(all_imports - local_modules - stdlib)
     return external_imports
+def extract_all_imports(path: str):
+    """Return all raw imports without filtering (for --all mode)."""
+    all_imports = set()
+    py_files = get_all_python_files(path)
+    for file in py_files:
+        all_imports.update(extract_imports_from_file(file))
+    return sorted(all_imports)
