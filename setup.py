@@ -18,7 +18,7 @@ else:
 
 setup(
     name="AutoReqGen",
-    version="0.1.13",
+    version="0.1.14",
     description="Smarter pipreqs alternative with code formatting and documentation generation",
     long_description=long_description,
     long_description_content_type="text/markdown",
