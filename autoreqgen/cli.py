@@ -2,6 +2,7 @@ import typer
 import json
 import subprocess
 import platform
+import sys
 from pathlib import Path
 
 from autoreqgen import scanner, requirements, formatter, docgen, utils
@@ -12,7 +13,10 @@ try:
 except ImportError:
     pass
 
-app = typer.Typer(help="🚀 AutoReqGen – Smarter Python dependency and tooling assistant.")
+app = typer.Typer(help="🚀 AutoReqGen – Smarter Python dependency and tooling assistant.",
+                  add_completion=True,
+                  pretty_exceptions_show_locals=False)
+
 
 @app.command()
 def scan(
@@ -44,6 +48,7 @@ def generate(
     imports = scanner.scan_project_for_imports(str(path))
     requirements.generate_requirements(imports, output_file=output, with_versions=with_versions)
 
+
 @app.command()
 def format(
     tool: str = typer.Argument(..., help="Choose from: black, isort, autopep8"),
@@ -56,6 +61,7 @@ def format(
         raise typer.Exit(code=1)
     formatter.run_formatter(tool, str(path))
 
+
 @app.command()
 def docs(
     path: Path = typer.Argument(..., help="Path to your Python code"),
@@ -65,6 +71,7 @@ def docs(
     """Generate documentation from docstrings."""
     utils.print_banner()
     docgen.generate_docs(str(path), output_file=output, include_private=include_private)
+
 
 @app.command()
 def add(package: str, path: Path = Path("requirements.txt")):
@@ -90,6 +97,7 @@ def add(package: str, path: Path = Path("requirements.txt")):
 
     typer.echo(f"✅ {package} added to {path} (sorted & deduplicated)")
 
+
 @app.command()
 def freeze(output: str = "requirements.txt"):
     """Freeze the current environment and write exact package versions to a file."""
@@ -107,10 +115,16 @@ def freeze(output: str = "requirements.txt"):
 
     typer.echo(f"✅ Environment frozen, sorted, and saved to {output}")
 
+
 @app.command()
 def start():
     """Create a new virtual environment by selecting Python version and name."""
     utils.print_banner()
+
+    if "google.colab" in sys.modules:
+        typer.echo("⚠️  Virtual environment creation is not supported in Google Colab.")
+        raise typer.Exit(code=1)
+
     env_name = typer.prompt("Enter a name for your virtual environment")
     command = "where python" if platform.system() == "Windows" else "which -a python"
     result = subprocess.run(command, shell=True, capture_output=True, text=True)
@@ -139,12 +153,13 @@ def start():
     else:
         typer.echo(f"❌ Failed to create virtual environment:\n{result.stderr}")
 
+
 @app.command()
 def watch(
     path: Path = typer.Argument(".", help="Path to watch for changes"),
     requirements_file: Path = typer.Option("requirements.txt", help="Requirements file to update")
 ):
-    """Watch file system for changes and auto-update requirements.txt."""
+    """Watch for changes in Python files and auto-update requirements."""
     utils.print_banner()
     typer.echo(f"👀 Watching {path} for changes...")
 
@@ -176,6 +191,7 @@ def watch(
         observer.stop()
         typer.echo("\n👋 Stopped watching.")
     observer.join()
+
 
 if __name__ == "__main__":
     app()

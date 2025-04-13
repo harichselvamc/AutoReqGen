@@ -228,7 +228,46 @@ AUTOREQGEN_IGNORE_DIRS=tests,examples
 AUTOREQGEN_INCLUDE_DEV=true
 AUTOREQGEN_VERBOSE=true
 ```
+# ⚠️ Google Colab Compatibility Disclaimer
 
+**AutoReqGen** is designed to run in standard Python environments (local, virtualenv, Conda, etc.). While many features work fine in Google Colab, there are some important limitations to be aware of:
+
+## ✅ Features that **work in Colab**:
+| Feature             | Status  | Description |
+|---------------------|---------|-------------|
+| `scan`              | ✅       | Scans Python files or projects to detect external imports. |
+| `generate`          | ✅       | Generates `requirements.txt` from scanned imports. |
+| `add <package>`     | ✅       | Installs a package and appends it to `requirements.txt`. |
+| `freeze`            | ✅       | Freezes the current environment (via `pip freeze`) into `requirements.txt`. |
+| `docs`              | ✅       | Extracts module, class, and function docstrings and generates markdown docs. |
+
+## 🚫 Features that **do NOT work in Colab**:
+| Feature             | Status  | Reason |
+|---------------------|---------|--------|
+| `start` (virtualenv creation) | ❌       | Google Colab does not allow creating or managing virtual environments. |
+| `watch` (live import updates) | ❌       | `watchdog` cannot run in sandboxed Colab environments due to limited file system access and event monitoring. |
+
+## 📌 Colab-Specific Handling
+When you run `AutoReqGen` inside Google Colab:
+- The `start` command is **disabled** to prevent errors.
+- A clear warning will be shown to the user:
+  ```
+  ⚠️  Virtual environment creation is not supported in Google Colab.
+  ```
+
+## 💡 Tip
+You can still install `AutoReqGen` in Colab and use it like this:
+
+```bash
+!pip install autoreqgen
+!autoreqgen scan .
+!autoreqgen generate .
+!autoreqgen freeze
+```
+
+---
+
+For full functionality, we recommend running **AutoReqGen** in a local or server-based Python environment (outside Colab).
 ## 🔌 Integration Examples
 
 ### Pre-commit Integration
