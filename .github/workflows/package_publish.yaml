@@ -194,7 +194,7 @@ jobs:
       - name: Install build dependencies
         run: |
           pip install --upgrade pip
-          pip install setuptools wheel build
+          pip install setuptools wheel build twine
           
       - name: Build package
         run: |
@@ -205,15 +205,24 @@ jobs:
         with:
           print-hash: true
           
+      - name: Configure GitHub Packages
+        run: |
+          cat > ~/.pypirc <<EOF
+          [distutils]
+          index-servers =
+              github
+
+          [github]
+          repository = https://upload.pkg.github.com/${{ github.repository_owner }}/AutoReqGen/
+          username = ${{ github.actor }}
+          password = ${{ secrets.PACKAGE_TOKEN }}
+          EOF
+          
       - name: Publish to GitHub Packages
         run: |
-          pip install twine
-          TWINE_USERNAME="__token__"
-          TWINE_PASSWORD="${{ secrets.PACKAGE_TOKEN }}"
-          TWINE_REPOSITORY_URL="https://upload.pkg.github.com/${{ github.repository }}/"
-          python -m twine upload --repository-url $TWINE_REPOSITORY_URL --username $TWINE_USERNAME --password $TWINE_PASSWORD dist/*
+          python -m twine upload --repository github dist/*
           
       - name: Verify publication
         run: |
           echo "📝 Package published to PyPI: https://pypi.org/project/autoreqgen/"
-          echo "📦 Package published to GitHub Packages: https://github.com/${{ github.repository }}/packages"
+          echo "📦 Package published to GitHub Packages: https://github.com/${{ github.repository_owner }}/AutoReqGen/packages"
