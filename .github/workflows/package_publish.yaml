@@ -51,86 +51,7 @@
 
 
 
-# name: Publish AutoReqGen Package to PyPI
-
-# on:
-#   push:
-#     branches:
-#       - main
-
-# jobs:
-#   test:
-#     name: Test on ${{ matrix.os }} - Python ${{ matrix.python-version }}
-#     runs-on: ${{ matrix.os }}
-#     strategy:
-#       matrix:
-#         os: [ubuntu-latest, windows-latest, macos-latest]
-#         python-version: ['3.9', '3.10', '3.11']
-
-#     steps:
-#       - name: Checkout code
-#         uses: actions/checkout@v3
-
-#       - name: Set up Python ${{ matrix.python-version }}
-#         uses: actions/setup-python@v4
-#         with:
-#           python-version: ${{ matrix.python-version }}
-
-#       - name: Install dependencies
-#         run: |
-#           pip install --upgrade pip
-#           pip install -e .[dev]
-#       - name: Run tests
-#         run: |
-#           python -m unittest discover tests || true  # prevent canceling matrix if one fails
-#   pypi-publish:
-#     name: Upload AutoReqGen release to PyPI
-#     needs: test
-#     runs-on: ubuntu-latest
-#     environment:
-#       name: pypi
-#       url: https://pypi.org/project/autoreqgen/
-
-#     permissions:
-#       id-token: write  # Required for trusted publishing
-
-#     steps:
-#       - name: Check if pushed by Harichselvam
-#         run: |
-#           echo "Committer email: ${{ github.event.head_commit.committer.email }}"
-#           if [[ "${{ github.event.head_commit.committer.email }}" != "harichselvamc@gmail.com" ]]; then
-#             echo "❌ Commit not by harichselvamc@gmail.com. Exiting CI/CD."
-#             exit 1
-#           fi
-#       - name: Checkout code
-#         uses: actions/checkout@v3
-
-#       - name: Set up Python
-#         uses: actions/setup-python@v4
-#         with:
-#           python-version: '3.11'
-
-#       - name: Install build dependencies
-#         run: |
-#           pip install --upgrade pip
-#           pip install setuptools wheel build
-#       - name: Build package
-#         run: |
-#           python -m build
-#       - name: Publish to PyPI (via Trusted Publisher)
-#         uses: pypa/gh-action-pypi-publish@release/v1
-#         with:
-#           print-hash: true
-
-#       - name: Mention in GitHub Packages
-#         run: |
-#           echo "📝 This package is published to PyPI: https://pypi.org/project/autoreqgen/"
-#           echo "📦 You can also publish to GitHub Packages if needed: https://github.com/${{ github.repository }}/packages"
-
-
-
-
-name: Publish AutoReqGen Package to PyPI and GitHub Packages
+name: Publish AutoReqGen Package to PyPI
 
 on:
   push:
@@ -162,9 +83,8 @@ jobs:
       - name: Run tests
         run: |
           python -m unittest discover tests || true  # prevent canceling matrix if one fails
-          
   pypi-publish:
-    name: Upload AutoReqGen release to PyPI and GitHub Packages
+    name: Upload AutoReqGen release to PyPI
     needs: test
     runs-on: ubuntu-latest
     environment:
@@ -173,7 +93,6 @@ jobs:
 
     permissions:
       id-token: write  # Required for trusted publishing
-      packages: write  # Required for GitHub Packages
 
     steps:
       - name: Check if pushed by Harichselvam
@@ -194,35 +113,18 @@ jobs:
       - name: Install build dependencies
         run: |
           pip install --upgrade pip
-          pip install setuptools wheel build twine
-          
+          pip install setuptools wheel build
       - name: Build package
         run: |
           python -m build
-          
       - name: Publish to PyPI (via Trusted Publisher)
         uses: pypa/gh-action-pypi-publish@release/v1
         with:
           print-hash: true
-          
-      - name: Configure GitHub Packages
-        run: |
-          cat > ~/.pypirc <<EOF
-          [distutils]
-          index-servers =
-              github
 
-          [github]
-          repository = https://upload.pkg.github.com/${{ github.repository_owner }}/AutoReqGen/
-          username = ${{ github.actor }}
-          password = ${{ secrets.PACKAGE_TOKEN }}
-          EOF
-          
-      - name: Publish to GitHub Packages
+      - name: Mention in GitHub Packages
         run: |
-          python -m twine upload --repository github dist/*
-          
-      - name: Verify publication
-        run: |
-          echo "📝 Package published to PyPI: https://pypi.org/project/autoreqgen/"
-          echo "📦 Package published to GitHub Packages: https://github.com/${{ github.repository_owner }}/AutoReqGen/packages"
+          echo "📝 This package is published to PyPI: https://pypi.org/project/autoreqgen/"
+          echo "📦 You can also publish to GitHub Packages if needed: https://github.com/${{ github.repository }}/packages"
+
+
