@@ -24,11 +24,11 @@ setup(
     long_description_content_type="text/markdown",
     author="Harichselvam",
     author_email="harichselvamc@gmail.com",
-    url="https://github.com/harichselvam/AutoReqGen",
+    url="https://github.com/harichselvamc/AutoReqGen",
     project_urls={
-        "Documentation": "https://github.com/harichselvam/AutoReqGen",
-        "Source": "https://github.com/harichselvam/AutoReqGen",
-        "Issues": "https://github.com/harichselvam/AutoReqGen/issues",
+        "Documentation": "https://github.com/harichselvamc/AutoReqGen",
+        "Source": "https://github.com/harichselvamc/AutoReqGen",
+        "Issues": "https://github.com/harichselvamc/AutoReqGen/issues",
     },
     packages=find_packages(
         exclude=["tests*", "examples*", "scripts*", "docs*"]
@@ -43,7 +43,7 @@ setup(
         "Operating System :: OS Independent",
     ],
     license="MIT",
-    python_requires=">=3.7",
+    python_requires=">=3.8",
     install_requires=[
         "typer[all]",
         "black",
