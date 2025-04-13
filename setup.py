@@ -12,13 +12,14 @@ else:
         "It filters out standard libraries and local modules, ensuring clean installable requirements. "
         "Additionally, AutoReqGen supports Python code formatting using Black, isort, and autopep8, and can generate "
         "documentation from Python docstrings in Markdown format. It includes a CLI powered by Typer, along with "
-        "options like `--all` to show full import sets, and `--as-json` to export structured output for dev tools. "
-        "Designed for developers who care about clean dependency management, automation, and project hygiene."
+        "options like `--all` to show full import sets, `--as-json` to export structured output for dev tools, "
+        "`add` to install and register packages, `freeze` to lock dependencies, `start` to create virtual environments, "
+        "and automatic `.env` and file watching support."
     )
 
 setup(
     name="AutoReqGen",
-    version="0.1.18",
+    version="0.1.19",
     description="Smarter pipreqs alternative with code formatting and documentation generation",
     long_description=long_description,
     long_description_content_type="text/markdown",
@@ -48,11 +49,16 @@ setup(
         "typer[all]",
         "black",
         "isort",
-        "autopep8"
+        "autopep8",
+        "watchdog",        
+        "python-dotenv",   
+        "stdlib_list"      
     ],
     entry_points={
         "console_scripts": [
             "autoreqgen=autoreqgen.cli:app",
+            "autoreqgen-generate=autoreqgen.cli:generate",
+            "autoreqgen-g=autoreqgen.cli:generate"
         ],
     },
 )
