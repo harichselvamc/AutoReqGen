@@ -90,8 +90,8 @@ jobs:
       url: https://pypi.org/project/autoreqgen/
 
     permissions:
-      id-token: write  # Required for PyPI trusted publishing
-      packages: write  # Required to publish to GitHub Packages
+      id-token: write     # Required for PyPI Trusted Publishing
+      packages: write     # Required for GitHub Packages
 
     steps:
       - name: Check if pushed by Harichselvam
@@ -126,8 +126,7 @@ jobs:
 
       - name: Publish to GitHub Packages
         run: |
-          twine upload --repository-url https://upload.pypi.org/legacy/ dist/*
-          twine upload --repository-url https://upload.github.com/ dist/*
+          twine upload --repository-url https://upload.github.com/ dist/
         env:
           TWINE_USERNAME: __token__
           TWINE_PASSWORD: ${{ secrets.PACKAGE_TOKEN }}
