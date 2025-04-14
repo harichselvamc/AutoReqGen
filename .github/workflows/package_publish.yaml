@@ -194,7 +194,7 @@ jobs:
 
       - name: Install build dependencies
         run: |
-          pip install --upgrade pip setuptools wheel  # Install tools needed for building the package
+          pip install --upgrade pip setuptools wheel build  # Install tools needed for building the package
 
       - name: Build package
         run: |
