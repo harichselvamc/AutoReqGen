@@ -16,7 +16,7 @@ def extract_imports_from_file(filepath: str):
         try:
             node = ast.parse(f.read(), filename=filepath)
         except SyntaxError:
-            return set()  # skip files with syntax errors
+            return set()  
 
     imports = set()
     for n in ast.walk(node):
@@ -32,19 +32,19 @@ def scan_project_for_imports(path: str):
     all_imports = set()
     py_files = get_all_python_files(path)
 
-    # Local module names (file names without .py)
+    
     local_modules = {
         os.path.splitext(os.path.basename(f))[0]
         for f in py_files
     }
 
-    # Python stdlib for current version
+    
     stdlib = set(stdlib_list(f"{sys.version_info.major}.{sys.version_info.minor}"))
 
     for file in py_files:
         all_imports.update(extract_imports_from_file(file))
 
-    # Filter out local modules and standard library
+    
     external_imports = sorted(all_imports - local_modules - stdlib)
     return external_imports
 def extract_all_imports(path: str):

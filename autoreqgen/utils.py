@@ -20,6 +20,5 @@ def print_banner():
      🚀 AutoReqGen 
     """)
 
-# Test banner
 if __name__ == "__main__":
     print_banner()

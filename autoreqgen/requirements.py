@@ -15,7 +15,7 @@ def generate_requirements(imports: list, output_file: str = "requirements.txt", 
     lines = []
     for pkg in imports:
         if pkg in stdlib:
-            continue  # Skip standard library modules
+            continue 
 
         version = get_installed_version(pkg)
         if version and with_versions:

@@ -66,6 +66,6 @@ def run_formatter(tool: str, path: str = "."):
         print(f"❌ {tool} failed with error:")
         print(result.stderr)
 
-# Optional direct test run
+
 if __name__ == "__main__":
     run_formatter("black", "./examples/sample_project1")
