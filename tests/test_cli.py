@@ -1,63 +1,61 @@
 import unittest
-import subprocess
 import os
-import sys
+from pathlib import Path
+from tempfile import TemporaryDirectory
+from typer.testing import CliRunner
 
-CLI_PATH = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
-TEST_PATH = os.path.join(CLI_PATH, "examples", "sample_project1")
-MAIN_FILE = os.path.join(TEST_PATH, "main.py")
+from autoreqgen.cli import app
 
-# Python command that ensures autoreqgen is found
-PYTHON_CMD = [
-    sys.executable,
-    "-c",
-    (
-        "import sys, os; "
-        f"sys.path.insert(0, r'{CLI_PATH}'); "
-        "from autoreqgen.cli import app; "
-        "import typer; "
-        "typer.run(app)"
-    )
-]
+RUNNER = CliRunner()
 
 class TestCLI(unittest.TestCase):
-
     def setUp(self):
-        os.makedirs(TEST_PATH, exist_ok=True)
-        with open(MAIN_FILE, "w") as f:
-            f.write('''
-import os
-import sys
-
-def sample():
-    print("Test")
-''')
-
-    def test_scan_command(self):
-        result = subprocess.run(PYTHON_CMD + ["scan", TEST_PATH], capture_output=True, text=True)
-        print("\nSCAN STDOUT:", result.stdout)
-        print("SCAN STDERR:", result.stderr)
-        self.assertEqual(result.returncode, 0)
-        self.assertIn("📦", result.stdout)
-
-    def test_generate_command(self):
-        result = subprocess.run(PYTHON_CMD + ["generate", TEST_PATH, "--output", "cli_requirements.txt"], capture_output=True, text=True)
-        print("\nGENERATE STDOUT:", result.stdout)
-        print("GENERATE STDERR:", result.stderr)
-        self.assertEqual(result.returncode, 0)
-        self.assertTrue(os.path.exists("cli_requirements.txt"))
-
-    def test_docs_command(self):
-        result = subprocess.run(PYTHON_CMD + ["docs", TEST_PATH, "--output", "cli_docs.md"], capture_output=True, text=True)
-        print("\nDOCS STDOUT:", result.stdout)
-        print("DOCS STDERR:", result.stderr)
-        self.assertEqual(result.returncode, 0)
-        self.assertTrue(os.path.exists("cli_docs.md"))
+        self.tmp = TemporaryDirectory()
+        self.tmp_path = Path(self.tmp.name)
+        # sample project layout
+        self.project = self.tmp_path / "sample_project1"
+        self.project.mkdir(parents=True, exist_ok=True)
+        (self.project / "main.py").write_text(
+            "import os\nimport sys\n\ndef sample():\n    print('Test')\n",
+            encoding="utf-8",
+        )
+        # run commands from tmp
+        self.cwd = os.getcwd()
+        os.chdir(self.tmp_path)
 
     def tearDown(self):
-        for file in ["cli_requirements.txt", "cli_docs.md", MAIN_FILE]:
-            if os.path.exists(file):
-                os.remove(file)
+        os.chdir(self.cwd)
+        self.tmp.cleanup()
+
+    def test_scan_command(self):
+        result = RUNNER.invoke(app, ["scan", str(self.project)])
+        # Debug on failure
+        if result.exit_code != 0:
+            print("\nSCAN OUTPUT:", result.output)
+        self.assertEqual(result.exit_code, 0)
+        # Avoid strict emoji assertion; just check summary line
+        self.assertIn("Found", result.output)
+
+    def test_generate_command(self):
+        out_file = self.tmp_path / "cli_requirements.txt"
+        result = RUNNER.invoke(app, ["generate", str(self.project), "--output", str(out_file)])
+        if result.exit_code != 0:
+            print("\nGENERATE OUTPUT:", result.output)
+        self.assertEqual(result.exit_code, 0)
+        self.assertTrue(out_file.exists())
+        # file should be newline-terminated and text
+        content = out_file.read_text(encoding="utf-8")
+        self.assertTrue(content == "" or content.endswith("\n"))
+
+    def test_docs_command(self):
+        out_file = self.tmp_path / "cli_docs.md"
+        result = RUNNER.invoke(app, ["docs", str(self.project), "--output", str(out_file)])
+        if result.exit_code != 0:
+            print("\nDOCS OUTPUT:", result.output)
+        self.assertEqual(result.exit_code, 0)
+        self.assertTrue(out_file.exists())
+        text = out_file.read_text(encoding="utf-8")
+        self.assertIn("Auto-Generated Documentation", text)
 
 if __name__ == "__main__":
     unittest.main()

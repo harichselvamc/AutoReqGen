@@ -1,0 +1,8 @@
+typer[all]
+black
+isort
+autopep8
+watchdog
+python-dotenv
+stdlib-list
+setuptools

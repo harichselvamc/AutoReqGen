@@ -13,6 +13,7 @@ AutoReqGen.egg-info/PKG-INFO
 AutoReqGen.egg-info/SOURCES.txt
 AutoReqGen.egg-info/dependency_links.txt
 AutoReqGen.egg-info/entry_points.txt
+AutoReqGen.egg-info/requires.txt
 AutoReqGen.egg-info/top_level.txt
 autoreqgen/__init__.py
 autoreqgen/cli.py

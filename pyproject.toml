@@ -1,13 +1,13 @@
 [build-system]
-requires = ["setuptools>=42", "wheel"]
+requires = ["setuptools>=64", "wheel"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "AutoReqGen"
-version = "0.1.25"
+name = "autoreqgen"
+version = "0.1.26"
 description = "Smarter pipreqs alternative with code formatting and documentation generation"
 readme = "README.md"
-requires-python = ">=3.7"
+requires-python = ">=3.8"
 license = { text = "MIT" }
 
 authors = [
@@ -17,20 +17,66 @@ authors = [
 keywords = ["pipreqs", "automation", "requirements", "docgen", "formatter"]
 
 dependencies = [
-  "typer[all]",
-  "black",
-  "isort",
-  "autopep8",
-  "watchdog",
-  "python-dotenv",
-  "stdlib-list",
-  "setuptools"
+  "typer>=0.9.0",
+  "click>=8.1.0",
+]
+
+classifiers = [
+  "Development Status :: 4 - Beta",
+  "Intended Audience :: Developers",
+  "License :: OSI Approved :: MIT License",
+  "Programming Language :: Python",
+  "Programming Language :: Python :: 3",
+  "Programming Language :: Python :: 3.8",
+  "Programming Language :: Python :: 3.9",
+  "Programming Language :: Python :: 3.10",
+  "Programming Language :: Python :: 3.11",
+  "Programming Language :: Python :: 3.12",
+  "Topic :: Software Development",
+  "Topic :: Software Development :: Build Tools",
+  "Environment :: Console",
+  "Operating System :: OS Independent",
 ]
 
 [project.urls]
-Documentation = "https://github.com/harichselvamc/AutoReqGen"
+Homepage = "https://github.com/harichselvamc/AutoReqGen"
+Documentation = "https://github.com/harichselvamc/AutoReqGen#readme"
+Repository = "https://github.com/harichselvamc/AutoReqGen"
 Source = "https://github.com/harichselvamc/AutoReqGen"
 Issues = "https://github.com/harichselvamc/AutoReqGen/issues"
+Changelog = "https://github.com/harichselvamc/AutoReqGen/releases"
 
 [project.scripts]
 autoreqgen = "autoreqgen.cli:app"
+
+[project.optional-dependencies]
+format = [
+  "black>=23.0.0",
+  "isort>=5.10.0",
+  "autopep8>=2.0.0",
+]
+watch = [
+  "watchdog>=2.1.0",
+]
+dotenv = [
+  "python-dotenv>=1.0.0",
+]
+dev = [
+  "pytest",
+  "coverage",
+  "mypy",
+  "ruff",
+  "types-setuptools",
+]
+
+[tool.setuptools]
+# Default discovery is fine for a standard package layout
+package-dir = {"" = "."}
+packages = ["autoreqgen"]
+
+[tool.black]
+line-length = 88
+target-version = ["py38", "py39", "py310", "py311", "py312"]
+
+[tool.isort]
+profile = "black"
