@@ -1,7 +1,3 @@
-# AutoReqGen
-
-> ⚡ A smarter alternative to pipreqs — AutoReqGen scans your entire project recursively, accurately generates requirements.txt with exact versions, formats your code using tools like Black or isort, and even auto-generates documentation from your docstrings. One tool to automate and optimize your Python workflow.
-
 ## Core Badges
 
 
@@ -10,6 +6,10 @@
 [![PyPI Downloads](https://static.pepy.tech/badge/autoreqgen/month)](https://pepy.tech/projects/autoreqgen)
 [![PyPI Downloads](https://static.pepy.tech/badge/autoreqgen)](https://pepy.tech/projects/autoreqgen)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
+
+# AutoReqGen
+
+> ⚡ A smarter alternative to pipreqs — AutoReqGen scans your entire project recursively, accurately generates requirements.txt with exact versions, formats your code using tools like Black or isort, and even auto-generates documentation from your docstrings. One tool to automate and optimize your Python workflow.
 
 
 ##  Activity & Maintenance
