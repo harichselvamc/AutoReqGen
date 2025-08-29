@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "autoreqgen"
-version = "0.1.26"
+version = "0.1.27"
 description = "Smarter pipreqs alternative with code formatting and documentation generation"
 readme = "README.md"
 requires-python = ">=3.8"
