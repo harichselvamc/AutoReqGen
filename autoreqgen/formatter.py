@@ -19,7 +19,7 @@ def run_formatter(tool: str, path: str = ".") -> None:
 
     # Check presence; don't auto-install here (keep function pure for tests)
     if shutil.which(tool) is None:
-        print(f"⚠️  '{tool}' is not installed. Please run 'pip install {tool}' first.")
+        print(f"'{tool}' is not installed. Please run 'pip install {tool}' first.")
         return
 
     commands = {
@@ -38,6 +38,6 @@ def run_formatter(tool: str, path: str = ".") -> None:
         print(result.stderr)
 
     if result.returncode == 0:
-        print(f"✅ {tool} formatting completed.")
+        print(f" {tool} formatting completed.")
     else:
-        print(f"❌ {tool} failed with exit code {result.returncode}.")
+        print(f" {tool} failed with exit code {result.returncode}.")

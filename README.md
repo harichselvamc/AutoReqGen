@@ -2,7 +2,7 @@
 
 > ⚡ A smarter alternative to pipreqs — AutoReqGen scans your entire project recursively, accurately generates requirements.txt with exact versions, formats your code using tools like Black or isort, and even auto-generates documentation from your docstrings. One tool to automate and optimize your Python workflow.
 
-## 📌 Core Badges
+## Core Badges
 
 
 [![PyPI version](https://badge.fury.io/py/autoreqgen.svg)](https://badge.fury.io/py/autoreqgen)
@@ -12,34 +12,34 @@
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 
 
-## 📊 Activity & Maintenance
+##  Activity & Maintenance
 
 [![GitHub last commit](https://img.shields.io/github/last-commit/harichselvamc/autoreqgen.svg)](https://github.com/harichselvamc/autoreqgen/commits/main)
 [![GitHub issues](https://img.shields.io/github/issues/harichselvamc/autoreqgen.svg)](https://github.com/harichselvamc/autoreqgen/issues)
 [![GitHub pull requests](https://img.shields.io/github/issues-pr/harichselvamc/autoreqgen.svg)](https://github.com/harichselvamc/autoreqgen/pulls)
 [![Contributors](https://img.shields.io/github/contributors/harichselvamc/autoreqgen.svg)](https://github.com/harichselvamc/autoreqgen/graphs/contributors)
 
-## 📦 Repo Stats
+## Repo Stats
 
 [![GitHub stars](https://img.shields.io/github/stars/harichselvamc/autoreqgen.svg)](https://github.com/harichselvamc/autoreqgen/stargazers)
 [![GitHub forks](https://img.shields.io/github/forks/harichselvamc/autoreqgen.svg)](https://github.com/harichselvamc/autoreqgen/network/members)
 [![GitHub watchers](https://img.shields.io/github/watchers/harichselvamc/autoreqgen.svg)](https://github.com/harichselvamc/autoreqgen/watchers)
 
-## ✨ Features
+## Features
 
-- 📦 Auto-generate requirements.txt with or without version numbers
-- 🧠 Filters standard library & local modules
-- 🧹 Format code using black, isort, or autopep8
-- 📝 Auto-generate DOCUMENTATION.md from your codebase docstrings
-- 👀 Live import watching with autoreqgen watch
-- 🧪 Add packages with autoreqgen add (auto-installs and appends)
-- ❄️ autoreqgen freeze to lock all installed packages (sorted & deduplicated)
-- 🐍 autoreqgen start to create a new virtual environment using system Pythons
-- 📊 --as-json and --all flag support
-- 🧪 Auto detects .env files for configuration
-- 🎯 CLI aliases like g for generate, f for format, etc.
+- Auto-generate requirements.txt with or without version numbers
+- Filters standard library & local modules
+- Format code using black, isort, or autopep8
+- Auto-generate DOCUMENTATION.md from your codebase docstrings
+- Live import watching with autoreqgen watch
+- Add packages with autoreqgen add (auto-installs and appends)
+- autoreqgen freeze to lock all installed packages (sorted & deduplicated)
+- autoreqgen start to create a new virtual environment using system Pythons
+- --as-json and --all flag support
+- Auto detects .env files for configuration
+- CLI aliases like g for generate, f for format, etc.
 
-## 🚀 Quickstart
+## Quickstart
 
 ### Install the package
 
@@ -106,7 +106,7 @@ myproject/
 ├── DOCUMENTATION.md
 ```
 
-## 📚 Detailed Usage
+## Detailed Usage
 
 ### Scanning Projects
 
@@ -218,7 +218,7 @@ autoreqgen start --python 3.10
 autoreqgen start --packages "requests pandas"
 ```
 
-## 🔧 Configuration
+## Configuration
 
 AutoReqGen can be configured using environment variables or `.env` files:
 
@@ -228,11 +228,11 @@ AUTOREQGEN_IGNORE_DIRS=tests,examples
 AUTOREQGEN_INCLUDE_DEV=true
 AUTOREQGEN_VERBOSE=true
 ```
-# ⚠️ Google Colab Compatibility Disclaimer
+# Google Colab Compatibility Disclaimer
 
 **AutoReqGen** is designed to run in standard Python environments (local, virtualenv, Conda, etc.). While many features work fine in Google Colab, there are some important limitations to be aware of:
 
-## ✅ Features that **work in Colab**:
+## Features that **work in Colab**:
 | Feature             | Status  | Description |
 |---------------------|---------|-------------|
 | `scan`              | ✅       | Scans Python files or projects to detect external imports. |

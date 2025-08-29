@@ -16,7 +16,7 @@ except ImportError:
     pass
 
 app = typer.Typer(
-    help="🚀 AutoReqGen – Smarter Python dependency and tooling assistant.",
+    help="AutoReqGen – Smarter Python dependency and tooling assistant.",
     add_completion=True,
     pretty_exceptions_show_locals=False,
 )
@@ -50,8 +50,8 @@ def scan(
         typer.echo(json.dumps(imports, indent=2))
     else:
         for imp in imports:
-            typer.echo(f"📦 {imp}")
-        typer.echo(f"\n✅ Found {len(imports)} unique imports.")
+            typer.echo(f"{imp}")
+        typer.echo(f"\nFound {len(imports)} unique imports.")
 
 
 @app.command()
@@ -70,9 +70,9 @@ def generate(
 
     try:
         requirements.generate_requirements(imports, output_file=output, with_versions=with_versions)
-        typer.echo(f"✅ Wrote {output}")
+        typer.echo(f"Wrote {output}")
     except Exception as e:
-        echo_err(f"❌ Failed to generate {output}: {e}")
+        echo_err(f"Failed to generate {output}: {e}")
         raise typer.Exit(code=1)
 
 
@@ -85,27 +85,27 @@ def format_cmd(
     utils.print_banner()
     tools = [t.strip() for t in tool.split(",") if t.strip()]
     if not tools:
-        echo_err("❌ No formatter provided.")
+        echo_err(" No formatter provided.")
         raise typer.Exit(code=1)
 
     # Pre-check installation for each requested tool to give fast feedback
     for t in tools:
         if not utils.is_tool_installed(t):
-            echo_err(f"❌ Error: `{t}` is not installed.")
+            echo_err(f"Error: `{t}` is not installed.")
             raise typer.Exit(code=1)
 
     for t in tools:
-        typer.echo(f"🧹 Running {t} on {path} ...")
+        typer.echo(f"Running {t} on {path} ...")
         try:
             formatter.run_formatter(t, str(path))
         except ValueError as e:
             # Unknown tool -> exit with clear message
-            echo_err(f"❌ {e}")
+            echo_err(f"{e}")
             raise typer.Exit(code=1)
         except Exception as e:
-            echo_err(f"❌ {t} failed: {e}")
+            echo_err(f"{t} failed: {e}")
             raise typer.Exit(code=1)
-    typer.echo("✅ Formatting complete.")
+    typer.echo("Formatting complete.")
 
 
 @app.command()
@@ -118,9 +118,9 @@ def docs(
     utils.print_banner()
     try:
         docgen.generate_docs(str(path), output_file=output, include_private=include_private)
-        typer.echo(f"✅ Documentation saved to {output}")
+        typer.echo(f"Documentation saved to {output}")
     except Exception as e:
-        echo_err(f"❌ Failed to generate docs: {e}")
+        echo_err(f"Failed to generate docs: {e}")
         raise typer.Exit(code=1)
 
 
@@ -131,14 +131,14 @@ def add(
 ):
     """Install a package and add it to requirements.txt (without version pinning unless specified)."""
     utils.print_banner()
-    typer.echo(f"📦 Installing {package} ...")
+    typer.echo(f"Installing {package} ...")
     result = run(pip_cmd("install", package))
     if result.returncode != 0:
-        echo_err(f"❌ Failed to install {package}:\n{result.stderr.strip()}")
+        echo_err(f"Failed to install {package}:\n{result.stderr.strip()}")
         raise typer.Exit(code=1)
 
     if not path.exists():
-        typer.echo(f"📄 Creating {path} ...")
+        typer.echo(f"Creating {path} ...")
         path.touch()
 
     # Read existing lines, strip comments/empties, dedupe case-insensitively
@@ -153,23 +153,23 @@ def add(
     new_lines = [existing[k] for k in sorted(existing.keys(), key=str.lower)]
     path.write_text("\n".join(new_lines) + "\n")
 
-    typer.echo(f"✅ Added to {path} (sorted & deduplicated)")
+    typer.echo(f"Added to {path} (sorted & deduplicated)")
 
 
 @app.command()
 def freeze(output: str = typer.Option("requirements.txt", "--output", "-o", help="Output requirements file")):
     """Freeze the current environment and write exact package versions to a file."""
     utils.print_banner()
-    typer.echo(f"📄 Freezing environment to {output} ...")
+    typer.echo(f"Freezing environment to {output} ...")
     result = run(pip_cmd("freeze"))
     if result.returncode != 0:
-        echo_err(f"❌ Failed to freeze environment:\n{result.stderr.strip()}")
+        echo_err(f"Failed to freeze environment:\n{result.stderr.strip()}")
         raise typer.Exit(code=1)
 
     frozen = {line.strip() for line in result.stdout.splitlines() if line.strip()}
     frozen_sorted = sorted(frozen, key=str.lower)
     Path(output).write_text("\n".join(frozen_sorted) + "\n")
-    typer.echo(f"✅ Environment frozen, sorted, and saved to {output}")
+    typer.echo(f"Environment frozen, sorted, and saved to {output}")
 
 
 @app.command()
@@ -182,7 +182,7 @@ def start(
     utils.print_banner()
 
     if "google.colab" in sys.modules:
-        typer.echo("⚠️  Virtual environment creation is not supported in Google Colab.")
+        typer.echo(" Virtual environment creation is not supported in Google Colab.")
         raise typer.Exit(code=1)
 
     env_name = name or ".venv"
@@ -195,7 +195,7 @@ def start(
         result = subprocess.run(cmd, shell=True, capture_output=True, text=True)
         python_paths = [line.strip() for line in result.stdout.splitlines() if "python" in line.lower()]
         if not python_paths:
-            echo_err("❌ No Python executables found.")
+            echo_err(" No Python executables found.")
             raise typer.Exit(code=1)
 
         typer.echo("\nAvailable Python executables:")
@@ -206,30 +206,30 @@ def start(
         try:
             selected_python = python_paths[choice - 1]
         except Exception:
-            echo_err("❌ Invalid choice.")
+            echo_err("Invalid choice.")
             raise typer.Exit(code=1)
 
-    typer.echo(f"\n🐍 Creating virtual environment `{env_name}` with {selected_python} ...")
+    typer.echo(f"\nCreating virtual environment `{env_name}` with {selected_python} ...")
     result = subprocess.run([selected_python, "-m", "venv", env_name], capture_output=True, text=True)
     if result.returncode != 0:
-        echo_err(f"❌ Failed to create virtual environment:\n{result.stderr.strip()}")
+        echo_err(f"Failed to create virtual environment:\n{result.stderr.strip()}")
         raise typer.Exit(code=1)
 
-    typer.echo(f"✅ Virtual environment `{env_name}` created successfully.")
+    typer.echo(f"Virtual environment `{env_name}` created successfully.")
     if platform.system() == "Windows":
-        typer.echo(f"💡 Activate: .\\{env_name}\\Scripts\\activate")
+        typer.echo(f"Activate: .\\{env_name}\\Scripts\\activate")
     else:
-        typer.echo(f"💡 Activate: source ./{env_name}/bin/activate")
+        typer.echo(f"Activate: source ./{env_name}/bin/activate")
 
     if packages:
-        typer.echo(f"📦 Installing packages into `{env_name}`: {packages}")
+        typer.echo(f"Installing packages into `{env_name}`: {packages}")
         # Use the venv's pip
         venv_python = Path(env_name) / ("Scripts/python.exe" if platform.system() == "Windows" else "bin/python")
         install = subprocess.run([str(venv_python), "-m", "pip", "install", *packages.split()], capture_output=True, text=True)
         if install.returncode != 0:
-            echo_err(f"⚠️  Packages install reported errors:\n{install.stderr.strip()}")
+            echo_err(f"Packages install reported errors:\n{install.stderr.strip()}")
         else:
-            typer.echo("✅ Packages installed.")
+            typer.echo("Packages installed.")
 
 
 @app.command()
@@ -243,17 +243,17 @@ def watch(
     utils.print_banner()
 
     if "google.colab" in sys.modules:
-        typer.echo("⚠️  File watching is not supported in Google Colab.")
+        typer.echo(" File watching is not supported in Google Colab.")
         raise typer.Exit(code=1)
 
     try:
         from watchdog.observers import Observer
         from watchdog.events import FileSystemEventHandler
     except ImportError:
-        typer.echo("⚙️ Installing missing dependency: watchdog")
+        typer.echo(" Installing missing dependency: watchdog")
         install = run(pip_cmd("install", "watchdog"))
         if install.returncode != 0:
-            echo_err(f"❌ Failed to install watchdog:\n{install.stderr.strip()}")
+            echo_err(f"Failed to install watchdog:\n{install.stderr.strip()}")
             raise typer.Exit(code=1)
         from watchdog.observers import Observer
         from watchdog.events import FileSystemEventHandler
@@ -261,24 +261,24 @@ def watch(
     class ImportChangeHandler(FileSystemEventHandler):
         def on_modified(self, event):
             if not event.is_directory and event.src_path.endswith(".py"):
-                typer.echo(f"\n🔁 Change detected: {event.src_path}")
+                typer.echo(f"\nChange detected: {event.src_path}")
                 imports = scanner.scan_project_for_imports(str(path))
                 try:
                     requirements.generate_requirements(imports, output_file=requirements_file, with_versions=True)
-                    typer.echo(f"✅ Updated {requirements_file}.")
+                    typer.echo(f"Updated {requirements_file}.")
                 except Exception as e:
-                    echo_err(f"❌ Failed to update {requirements_file}: {e}")
+                    echo_err(f"Failed to update {requirements_file}: {e}")
                 if format_tool:
                     if utils.is_tool_installed(format_tool):
                         try:
                             formatter.run_formatter(format_tool, str(path))
-                            typer.echo(f"🧹 Ran {format_tool}.")
+                            typer.echo(f"Ran {format_tool}.")
                         except ValueError as e:
-                            echo_err(f"❌ {e}")
+                            echo_err(f"{e}")
                         except Exception as e:
-                            echo_err(f"❌ Formatter error: {e}")
+                            echo_err(f"Formatter error: {e}")
                     else:
-                        echo_err(f"❌ `{format_tool}` is not installed.")
+                        echo_err(f"`{format_tool}` is not installed.")
 
     observer = Observer()
     handler = ImportChangeHandler()
@@ -290,11 +290,11 @@ def watch(
         while observer.is_alive():
             time.sleep(interval)
     except KeyboardInterrupt:
-        typer.echo("\n👋 Stopping...")
+        typer.echo("\nStopping...")
     finally:
         observer.stop()
         observer.join()
-        typer.echo("✅ Stopped watching.")
+        typer.echo("Stopped watching.")
 
 
 if __name__ == "__main__":

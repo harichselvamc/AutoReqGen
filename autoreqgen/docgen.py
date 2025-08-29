@@ -161,7 +161,7 @@ def extract_docstrings(file_path: str, include_private: bool = False) -> str:
     # Module header
     mod_doc = ast.get_docstring(node) or ""
     mod_summary, mod_body = _summary_and_body(mod_doc)
-    out.append(f"## 📄 Module: `{_md_escape(rel_path)}`")
+    out.append(f"##  Module: `{_md_escape(rel_path)}`")
     if mod_summary:
         out.append(f"\n> {_md_escape(mod_summary)}\n")
     if mod_body:
@@ -259,7 +259,7 @@ def generate_docs(
     """
     root = Path(path)
     if not root.exists():
-        print(f"❌ Path not found: {root}")
+        print(f" Path not found: {root}")
         return
 
     if root.is_file() and root.suffix == ".py":
@@ -267,7 +267,7 @@ def generate_docs(
     else:
         files = sorted(_iter_py_files(root, ignore_dirs or IGNORED_DIRS_DEFAULT), key=lambda p: str(p).lower())
 
-    sections: List[str] = ["# 📚 Auto-Generated Documentation\n"]
+    sections: List[str] = ["#  Auto-Generated Documentation\n"]
     toc: List[str] = ["\n## Table of Contents\n"]
 
     for fp in files:
@@ -283,7 +283,7 @@ def generate_docs(
     content = "\n".join([sections[0], *toc, "\n---\n", "\n---\n".join(sections[1:])]).strip() + "\n"
 
     Path(output_file).write_text(content, encoding="utf-8")
-    print(f"✅ Documentation saved to `{output_file}`")
+    print(f" Documentation saved to `{output_file}`")
 
 
 if __name__ == "__main__":

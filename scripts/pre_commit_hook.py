@@ -24,18 +24,18 @@ def run_tool(mod_name: str, args: List[str]) -> int:
     return proc.returncode
 
 def run_auto_format_check(files: List[str]) -> bool:
-    print("🔎 Checking code style with black and isort...")
+    print("Checking code style with black and isort...")
     ok = True
     # black --check
     if run_tool("black", ["--check", "--diff", *files]) != 0:
-        print("❌ black found issues.")
+        print(" black found issues.")
         ok = False
     # isort --check-only
     if run_tool("isort", ["--check-only", "--diff", *files]) != 0:
-        print("❌ isort found issues.")
+        print(" isort found issues.")
         ok = False
     if ok:
-        print("✅ Formatting checks passed.")
+        print("Formatting checks passed.")
     return ok
 
 def parse_req_names(lines: Iterable[str]) -> Set[str]:
@@ -73,7 +73,7 @@ def expected_requirements_names(project_root: Path) -> Set[str]:
             pass
 
 def check_requirements_sync(project_root: Path, req_path: Path = Path("requirements.txt")) -> bool:
-    print("📦 Checking requirements drift...")
+    print(" Checking requirements drift...")
     expected = expected_requirements_names(project_root)
     current = read_requirements_file(req_path)
 
@@ -84,19 +84,19 @@ def check_requirements_sync(project_root: Path, req_path: Path = Path("requireme
     ok = True
     if missing:
         ok = False
-        print("⚠️  Packages imported but missing from requirements.txt:")
+        print("Packages imported but missing from requirements.txt:")
         for name in sorted(missing):
             print(f"  - {name}")
         print("   → run: autoreqgen generate .")
 
     # Not failing on extras by default (dev/test tools), just inform:
     if extra:
-        print("ℹ️  Packages present in requirements.txt but not currently imported:")
+        print("ℹ  Packages present in requirements.txt but not currently imported:")
         for name in sorted(extra):
             print(f"  - {name}")
 
     if ok:
-        print("✅ requirements.txt is in sync.")
+        print(" requirements.txt is in sync.")
     return ok
 
 def main(argv: List[str]) -> int:
@@ -105,7 +105,7 @@ def main(argv: List[str]) -> int:
     req_ok = check_requirements_sync(Path("."))
     if not (fmt_ok and req_ok):
         return 1
-    print("✅ Pre-commit checks passed.")
+    print(" Pre-commit checks passed.")
     return 0
 
 if __name__ == "__main__":

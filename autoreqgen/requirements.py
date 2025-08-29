@@ -159,9 +159,9 @@ def generate_requirements(
     # Write file with trailing newline
     Path(output_file).write_text("\n".join(lines) + ("\n" if lines else ""), encoding="utf-8")
 
-    print(f"✅ {output_file} generated with {len(lines)} packages (excluding stdlib).")
+    print(f" {output_file} generated with {len(lines)} packages (excluding stdlib).")
     if unresolved:
         # Non-fatal, but helpful hint
         hint = ", ".join(sorted(unresolved))
-        print(f"ℹ️  Some imports didn’t map cleanly to a distribution: {hint}")
+        print(f"ℹ Some imports didn’t map cleanly to a distribution: {hint}")
         print("    You may need to add them manually or install the missing packages.")

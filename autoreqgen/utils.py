@@ -140,7 +140,7 @@ def print_banner() -> None:
     # Keep it simple/portable (no color codes)
     print(
         rf"""
-🚀 AutoReqGen{ver_str}
+ AutoReqGen{ver_str}
 """
     )
 
