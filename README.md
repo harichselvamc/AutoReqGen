@@ -331,3 +331,8 @@ RUN pip install -r requirements.txt
 
 CMD ["python", "main.py"]
 ```
+
+
+## Star History
+
+[![Star History Chart](https://api.star-history.com/svg?repos=harichselvamc/AutoReqGen&type=date&legend=top-left)](https://www.star-history.com/#harichselvamc/AutoReqGen&type=date&legend=top-left)
