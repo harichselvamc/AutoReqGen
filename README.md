@@ -9,7 +9,7 @@
 
 # AutoReqGen
 
-> ⚡ A smarter alternative to pipreqs — AutoReqGen scans your entire project recursively, accurately generates requirements.txt with exact versions, formats your code using tools like Black or isort, and even auto-generates documentation from your docstrings. One tool to automate and optimize your Python workflow.
+> A smarter alternative to pipreqs — AutoReqGen scans your entire project recursively, accurately generates requirements.txt with exact versions, formats your code using tools like Black or isort, and even auto-generates documentation from your docstrings. One tool to automate and optimize your Python workflow.
 
 
 ##  Activity & Maintenance
@@ -95,7 +95,7 @@ autoreqgen start
 autoreqgen freeze
 ```
 
-## 📁 Example Structure
+## Example Structure
 
 ```
 myproject/
@@ -241,13 +241,13 @@ AUTOREQGEN_VERBOSE=true
 | `freeze`            | ✅       | Freezes the current environment (via `pip freeze`) into `requirements.txt`. |
 | `docs`              | ✅       | Extracts module, class, and function docstrings and generates markdown docs. |
 
-## 🚫 Features that **do NOT work in Colab**:
+##  Features that **do NOT work in Colab**:
 | Feature             | Status  | Reason |
 |---------------------|---------|--------|
 | `start` (virtualenv creation) | ❌       | Google Colab does not allow creating or managing virtual environments. |
 | `watch` (live import updates) | ❌       | `watchdog` cannot run in sandboxed Colab environments due to limited file system access and event monitoring. |
 
-## 📌 Colab-Specific Handling
+##  Colab-Specific Handling
 When you run `AutoReqGen` inside Google Colab:
 - The `start` command is **disabled** to prevent errors.
 - A clear warning will be shown to the user:
@@ -255,7 +255,7 @@ When you run `AutoReqGen` inside Google Colab:
   ⚠️  Virtual environment creation is not supported in Google Colab.
   ```
 
-## 💡 Tip
+## Tip
 You can still install `AutoReqGen` in Colab and use it like this:
 
 ```bash
