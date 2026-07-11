@@ -212,3 +212,28 @@ jobs:
         run: |
           echo "📝 This package is published to PyPI: https://pypi.org/project/autoreqgen/"
           echo "📦 You can also publish to GitHub Packages if needed: https://github.com/${{ github.repository }}/packages"
+
+  github-release:
+    name: Create GitHub Release
+    needs: pypi-publish  # Only runs if the PyPI publish job succeeded
+    runs-on: ubuntu-latest
+
+    permissions:
+      contents: write  # Required to create tags/releases
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Read package version
+        id: version
+        run: |
+          VERSION=$(grep -m1 '^version' pyproject.toml | sed -E 's/version = "(.*)"/\1/')
+          echo "version=$VERSION" >> "$GITHUB_OUTPUT"
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: v${{ steps.version.outputs.version }}
+          name: AutoReqGen v${{ steps.version.outputs.version }}
+          generate_release_notes: true
