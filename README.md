@@ -11,6 +11,26 @@
 
 > A smarter alternative to pipreqs — AutoReqGen scans your entire project recursively, accurately generates requirements.txt with exact versions, formats your code using tools like Black or isort, and even auto-generates documentation from your docstrings. One tool to automate and optimize your Python workflow.
 
+## What's New in v0.1.29
+
+Three new commands aimed at making AutoReqGen easier to pick up for beginners and students:
+
+```bash
+# Scaffold a brand-new project in one step (main file, README, .gitignore, requirements.txt)
+autoreqgen init --yes --name my-first-app --type cli --venv --git
+
+# Get a plain-language health check of an existing project
+autoreqgen doctor .
+[OK]      requirements.txt: requirements.txt found.
+[WARNING] Pinned versions: Some packages aren't pinned to an exact version: typer
+    Try: autoreqgen freeze
+
+# Find out what a package actually does before you install it
+autoreqgen explain --scan .
+requests — send and receive HTTP requests easily
+```
+
+See [Project Scaffolding (`init`)](#project-scaffolding-init), [Health Check (`doctor`)](#health-check-doctor), and [Plain-English Package Explain (`explain`)](#plain-english-package-explain-explain) below for full usage.
 
 ##  Activity & Maintenance
 
@@ -35,6 +55,9 @@
 - Add packages with autoreqgen add (auto-installs and appends)
 - autoreqgen freeze to lock all installed packages (sorted & deduplicated)
 - autoreqgen start to create a new virtual environment using system Pythons
+- autoreqgen init to scaffold a new beginner-friendly project (with optional venv + git init)
+- autoreqgen doctor to run a friendly health check on your project
+- autoreqgen explain to describe what each package in your requirements does, in plain English
 - --as-json and --all flag support
 - Auto detects .env files for configuration
 - CLI aliases like g for generate, f for format, etc.
@@ -93,6 +116,24 @@ autoreqgen start
 
 ```bash
 autoreqgen freeze
+```
+
+### Scaffold a new beginner-friendly project
+
+```bash
+autoreqgen init
+```
+
+### Check your project's health
+
+```bash
+autoreqgen doctor .
+```
+
+### Explain what your dependencies do, in plain English
+
+```bash
+autoreqgen explain
 ```
 
 ## Example Structure
@@ -203,7 +244,7 @@ autoreqgen watch /path/to/project --interval 5
 autoreqgen watch /path/to/project --format black
 ```
 
-### Project Initialization
+### Virtual Environment Setup (`start`)
 
 Start a new Python project with a virtual environment:
 
@@ -216,6 +257,48 @@ autoreqgen start --python 3.10
 
 # Create with specific packages
 autoreqgen start --packages "requests pandas"
+```
+
+### Project Scaffolding (`init`)
+
+Scaffold a new beginner-friendly project — great for students starting from scratch:
+
+```bash
+# Interactive wizard (asks for name, type, venv, git)
+autoreqgen init
+
+# Fully non-interactive, using flags/defaults
+autoreqgen init --yes --name myapp --type cli --venv --git
+
+# Project types: basic, cli, web, data
+autoreqgen init --yes --type web
+```
+
+Creates a starter main file, `README.md`, `.gitignore`, and `requirements.txt`. Re-running `init` in the same folder is safe — it never overwrites existing files.
+
+### Health Check (`doctor`)
+
+Run a friendly check for common beginner project issues:
+
+```bash
+autoreqgen doctor .
+```
+
+Checks for: an active virtual environment, a `requirements.txt` file, imports that aren't installed, unpinned versions, and a `.gitignore` that covers your venv. Each check prints an `[OK]` / `[WARNING]` / `[FAILED]` line with a suggested fix; the command exits non-zero only when something is actually broken (`[FAILED]`).
+
+### Plain-English Package Explain (`explain`)
+
+Find out what a package actually does before you install it:
+
+```bash
+# Explain everything in requirements.txt
+autoreqgen explain
+
+# Explain imports found by scanning a project directly
+autoreqgen explain --scan .
+
+# Machine-readable output
+autoreqgen explain --as-json
 ```
 
 ## Configuration

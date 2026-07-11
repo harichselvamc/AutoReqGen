@@ -107,6 +107,25 @@ def _get_version(dist_name: str) -> str | None:
         except metadata.PackageNotFoundError:
             return None
 
+_SPECIFIER_RE = re.compile(r"[=<>!~;].*$")
+
+
+def parse_requirements_file(path: str | Path) -> List[str]:
+    """
+    Parse a requirements.txt-style file into a list of bare package names,
+    stripping comments, blank lines, and version specifiers. Preserves file order.
+    """
+    names: List[str] = []
+    for line in Path(path).read_text(encoding="utf-8").splitlines():
+        s = line.split("#", 1)[0].strip()
+        if not s:
+            continue
+        name = _SPECIFIER_RE.sub("", s).strip()
+        if name:
+            names.append(name)
+    return names
+
+
 def generate_requirements(
     imports: Iterable[str],
     output_file: str = "requirements.txt",

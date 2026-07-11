@@ -10,7 +10,7 @@ long_description = README.read_text(encoding="utf-8") if README.exists() else (
 
 setup(
     name="autoreqgen",
-    version="0.1.28",
+    version="0.1.29",
     description="Smarter pipreqs alternative with code formatting and documentation generation",
     long_description=long_description,
     long_description_content_type="text/markdown",
@@ -74,6 +74,7 @@ setup(
         "Programming Language :: Python :: 3.10",
         "Programming Language :: Python :: 3.11",
         "Programming Language :: Python :: 3.12",
+        "Programming Language :: Python :: 3.13",
         "Environment :: Console",
         "Operating System :: OS Independent",
     ],

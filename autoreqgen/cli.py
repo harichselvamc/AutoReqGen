@@ -1,19 +1,28 @@
 import typer
 import json
 import subprocess
-import platform
 import sys
 import time
 from pathlib import Path
 from typing import List
 
-from autoreqgen import scanner, requirements, formatter, docgen, utils
+from autoreqgen import scanner, requirements, formatter, docgen, utils, venv_helper, descriptions, scaffold
+from autoreqgen import doctor as doctor_mod
 
 try:
     from dotenv import load_dotenv
     load_dotenv()
 except ImportError:
     pass
+
+# Some terminals (notably the default Windows console codepage) can't encode
+# the emoji used in command output; force UTF-8 so it never crashes on those.
+for _stream in (sys.stdout, sys.stderr):
+    if hasattr(_stream, "reconfigure") and (_stream.encoding or "").lower() != "utf-8":
+        try:
+            _stream.reconfigure(encoding="utf-8")
+        except Exception:
+            pass
 
 app = typer.Typer(
     help="AutoReqGen – Smarter Python dependency and tooling assistant.",
@@ -73,6 +82,7 @@ def generate(
         typer.echo(f"Wrote {output}")
     except Exception as e:
         echo_err(f"Failed to generate {output}: {e}")
+        echo_err(f"Tip: check that '{path}' exists and that you have permission to write to '{output}'.")
         raise typer.Exit(code=1)
 
 
@@ -91,7 +101,7 @@ def format_cmd(
     # Pre-check installation for each requested tool to give fast feedback
     for t in tools:
         if not utils.is_tool_installed(t):
-            echo_err(f"Error: `{t}` is not installed.")
+            echo_err(f"'{t}' isn't installed yet. Run: pip install {t}")
             raise typer.Exit(code=1)
 
     for t in tools:
@@ -125,6 +135,56 @@ def docs(
 
 
 @app.command()
+def doctor(
+    path: Path = typer.Argument(".", help="Path to your Python project"),
+):
+    """Run a beginner-friendly health check on your project."""
+    utils.print_banner()
+    labels = {"ok": "[OK]     ", "warn": "[WARNING]", "fail": "[FAILED] "}
+    results = doctor_mod.run_all_checks(path)
+    for r in results:
+        typer.echo(f"{labels[r.status]} {r.name}: {r.message}")
+        if r.fix_hint:
+            typer.echo(f"    Try: {r.fix_hint}")
+
+    if any(r.status == "fail" for r in results):
+        raise typer.Exit(code=1)
+
+
+@app.command()
+def explain(
+    requirements_file: Path = typer.Option(Path("requirements.txt"), "--file", "-f", help="Requirements file to read"),
+    scan: Path = typer.Option(None, "--scan", help="Scan a project path for imports instead of reading a requirements file"),
+    as_json: bool = typer.Option(False, "--as-json", help="Output results in JSON format"),
+):
+    """Explain what each package in your requirements does, in plain English."""
+    utils.print_banner()
+
+    if scan is not None:
+        names = [
+            requirements.ALIAS_MAP.get(utils.pep503_normalize(imp), imp)
+            for imp in scanner.scan_project_for_imports(str(scan))
+        ]
+    else:
+        if not requirements_file.exists():
+            echo_err(f"'{requirements_file}' not found. Run `autoreqgen generate .` first, or use --scan <path>.")
+            raise typer.Exit(code=1)
+        names = requirements.parse_requirements_file(requirements_file)
+
+    if not names:
+        typer.echo("No packages found to explain.")
+        raise typer.Exit(code=0)
+
+    entries = [(name, descriptions.describe(name)) for name in names]
+
+    if as_json:
+        typer.echo(json.dumps({name: desc for name, desc in entries}, indent=2))
+    else:
+        for name, desc in entries:
+            typer.echo(f"{name} — {desc}")
+
+
+@app.command()
 def add(
     package: str = typer.Argument(..., help='Package specifier, e.g. "requests" or "requests>=2.25.0"'),
     path: Path = typer.Option(Path("requirements.txt"), "--path", "-p", help="Path to requirements file"),
@@ -135,6 +195,7 @@ def add(
     result = run(pip_cmd("install", package))
     if result.returncode != 0:
         echo_err(f"Failed to install {package}:\n{result.stderr.strip()}")
+        echo_err("Tip: double check the package name for typos, and make sure you're connected to the internet.")
         raise typer.Exit(code=1)
 
     if not path.exists():
@@ -173,6 +234,69 @@ def freeze(output: str = typer.Option("requirements.txt", "--output", "-o", help
 
 
 @app.command()
+def init(
+    name: str = typer.Option(None, "--name", help="Project name (used for the folder name and README title)"),
+    type: str = typer.Option(None, "--type", help="Project type: basic, cli, web, data"),
+    dest: Path = typer.Option(Path("."), "--dest", help="Directory to scaffold into (created if missing)"),
+    venv: bool = typer.Option(None, "--venv/--no-venv", help="Create a virtual environment"),
+    venv_name: str = typer.Option(".venv", "--venv-name", help="Name for the virtual environment"),
+    git: bool = typer.Option(None, "--git/--no-git", help="Run `git init`"),
+    yes: bool = typer.Option(False, "--yes", "-y", help="Never prompt; use flags/defaults for anything unspecified"),
+):
+    """Interactively scaffold a new beginner-friendly Python project."""
+    utils.print_banner()
+
+    resolved_dest = dest.resolve()
+
+    resolved_name = name
+    if resolved_name is None:
+        resolved_name = resolved_dest.name if yes else typer.prompt("Project name", default=resolved_dest.name)
+
+    resolved_type_raw = type
+    if resolved_type_raw is None:
+        resolved_type_raw = "basic" if yes else typer.prompt("Project type (basic, cli, web, data)", default="basic")
+
+    try:
+        resolved_type = scaffold.normalize_project_type(resolved_type_raw)
+    except ValueError as e:
+        echo_err(str(e))
+        raise typer.Exit(code=1)
+
+    resolved_venv = venv
+    if resolved_venv is None:
+        resolved_venv = False if yes else typer.confirm("Create a virtual environment?", default=False)
+
+    resolved_git = git
+    if resolved_git is None:
+        resolved_git = False if yes else typer.confirm("Initialize a git repository?", default=False)
+
+    notes = scaffold.scaffold_project(resolved_dest, resolved_name, resolved_type, venv_name=venv_name)
+    for note in notes:
+        typer.echo(note)
+
+    if resolved_venv:
+        typer.echo(f"\nCreating virtual environment `{venv_name}` ...")
+        result = venv_helper.create_venv(sys.executable, str(resolved_dest / venv_name))
+        if result.ok:
+            typer.echo(result.message)
+            typer.echo(f"Activate: {result.activate_hint}")
+        else:
+            echo_err(result.message)
+
+    if resolved_git:
+        if utils.is_tool_installed("git"):
+            git_result = utils.run_cmd(["git", "init"], cwd=resolved_dest)
+            if git_result.returncode == 0:
+                typer.echo("Initialized a git repository.")
+            else:
+                echo_err(f"`git init` failed:\n{git_result.stderr.strip()}")
+        else:
+            typer.echo("Skipping git init: `git` isn't installed.")
+
+    typer.echo(f"\n Project ready in {resolved_dest}")
+
+
+@app.command()
 def start(
     python: str = typer.Option(None, "--python", help="Path to python executable to use"),
     name: str = typer.Option(None, "--name", "-n", help="Name for the virtual environment (default: .venv)"),
@@ -190,10 +314,7 @@ def start(
     # Resolve python executable
     selected_python = python
     if not selected_python:
-        # List available pythons
-        cmd = "where python" if platform.system() == "Windows" else "which -a python"
-        result = subprocess.run(cmd, shell=True, capture_output=True, text=True)
-        python_paths = [line.strip() for line in result.stdout.splitlines() if "python" in line.lower()]
+        python_paths = venv_helper.list_available_pythons()
         if not python_paths:
             echo_err(" No Python executables found.")
             raise typer.Exit(code=1)
@@ -210,22 +331,18 @@ def start(
             raise typer.Exit(code=1)
 
     typer.echo(f"\nCreating virtual environment `{env_name}` with {selected_python} ...")
-    result = subprocess.run([selected_python, "-m", "venv", env_name], capture_output=True, text=True)
-    if result.returncode != 0:
-        echo_err(f"Failed to create virtual environment:\n{result.stderr.strip()}")
+    result = venv_helper.create_venv(selected_python, env_name)
+    if not result.ok:
+        echo_err(result.message)
+        echo_err("Tip: make sure the Python path is correct and executable.")
         raise typer.Exit(code=1)
 
-    typer.echo(f"Virtual environment `{env_name}` created successfully.")
-    if platform.system() == "Windows":
-        typer.echo(f"Activate: .\\{env_name}\\Scripts\\activate")
-    else:
-        typer.echo(f"Activate: source ./{env_name}/bin/activate")
+    typer.echo(result.message)
+    typer.echo(f"Activate: {result.activate_hint}")
 
     if packages:
         typer.echo(f"Installing packages into `{env_name}`: {packages}")
-        # Use the venv's pip
-        venv_python = Path(env_name) / ("Scripts/python.exe" if platform.system() == "Windows" else "bin/python")
-        install = subprocess.run([str(venv_python), "-m", "pip", "install", *packages.split()], capture_output=True, text=True)
+        install = venv_helper.install_packages_into_venv(env_name, packages.split())
         if install.returncode != 0:
             echo_err(f"Packages install reported errors:\n{install.stderr.strip()}")
         else:
@@ -278,7 +395,7 @@ def watch(
                         except Exception as e:
                             echo_err(f"Formatter error: {e}")
                     else:
-                        echo_err(f"`{format_tool}` is not installed.")
+                        echo_err(f"'{format_tool}' isn't installed yet. Run: pip install {format_tool}")
 
     observer = Observer()
     handler = ImportChangeHandler()

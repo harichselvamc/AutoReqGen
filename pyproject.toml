@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "autoreqgen"
-version = "0.1.28"
+version = "0.1.29"
 description = "Smarter pipreqs alternative with code formatting and documentation generation"
 readme = "README.md"
 requires-python = ">=3.8"
@@ -32,6 +32,7 @@ classifiers = [
   "Programming Language :: Python :: 3.10",
   "Programming Language :: Python :: 3.11",
   "Programming Language :: Python :: 3.12",
+  "Programming Language :: Python :: 3.13",
   "Topic :: Software Development",
   "Topic :: Software Development :: Build Tools",
   "Environment :: Console",
@@ -76,7 +77,7 @@ packages = ["autoreqgen"]
 
 [tool.black]
 line-length = 88
-target-version = ["py38", "py39", "py310", "py311", "py312"]
+target-version = ["py38", "py39", "py310", "py311", "py312", "py313"]
 
 [tool.isort]
 profile = "black"
