@@ -143,7 +143,7 @@ jobs:
     strategy:
       matrix:
         os: [ubuntu-latest, windows-latest, macos-latest]  # Test on multiple operating systems
-        python-version: ['3.9', '3.10', '3.11', '3.12', '3.13']  # Test on multiple Python versions, including the latest
+        python-version: ['3.9', '3.10', '3.11', '3.12', '3.13', '3.14']  # Test on multiple Python versions, including the latest
 
     steps:
       - name: Checkout code

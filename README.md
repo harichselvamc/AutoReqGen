@@ -318,24 +318,24 @@ AUTOREQGEN_VERBOSE=true
 ## Features that **work in Colab**:
 | Feature             | Status  | Description |
 |---------------------|---------|-------------|
-| `scan`              | ✅       | Scans Python files or projects to detect external imports. |
-| `generate`          | ✅       | Generates `requirements.txt` from scanned imports. |
-| `add <package>`     | ✅       | Installs a package and appends it to `requirements.txt`. |
-| `freeze`            | ✅       | Freezes the current environment (via `pip freeze`) into `requirements.txt`. |
-| `docs`              | ✅       | Extracts module, class, and function docstrings and generates markdown docs. |
+| `scan`              | Yes     | Scans Python files or projects to detect external imports. |
+| `generate`          | Yes     | Generates `requirements.txt` from scanned imports. |
+| `add <package>`     | Yes     | Installs a package and appends it to `requirements.txt`. |
+| `freeze`            | Yes     | Freezes the current environment (via `pip freeze`) into `requirements.txt`. |
+| `docs`              | Yes     | Extracts module, class, and function docstrings and generates markdown docs. |
 
 ##  Features that **do NOT work in Colab**:
 | Feature             | Status  | Reason |
 |---------------------|---------|--------|
-| `start` (virtualenv creation) | ❌       | Google Colab does not allow creating or managing virtual environments. |
-| `watch` (live import updates) | ❌       | `watchdog` cannot run in sandboxed Colab environments due to limited file system access and event monitoring. |
+| `start` (virtualenv creation) | No      | Google Colab does not allow creating or managing virtual environments. |
+| `watch` (live import updates) | No      | `watchdog` cannot run in sandboxed Colab environments due to limited file system access and event monitoring. |
 
 ##  Colab-Specific Handling
 When you run `AutoReqGen` inside Google Colab:
 - The `start` command is **disabled** to prevent errors.
 - A clear warning will be shown to the user:
   ```
-  ⚠️  Virtual environment creation is not supported in Google Colab.
+  Warning: Virtual environment creation is not supported in Google Colab.
   ```
 
 ## Tip
@@ -351,7 +351,7 @@ You can still install `AutoReqGen` in Colab and use it like this:
 ---
 
 For full functionality, we recommend running **AutoReqGen** in a local or server-based Python environment (outside Colab).
-## 🔌 Integration Examples
+## Integration Examples
 
 ### Pre-commit Integration
 
